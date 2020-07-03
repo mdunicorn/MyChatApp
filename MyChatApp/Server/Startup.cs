@@ -44,6 +44,7 @@ namespace MyChatApp.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,6 +77,7 @@ namespace MyChatApp.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHub<Hubs.ChatHub>(Shared.ChatClient.HubUrl);
                 endpoints.MapFallbackToFile("index.html");
             });
         }
