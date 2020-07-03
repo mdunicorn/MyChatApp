@@ -31,7 +31,7 @@ namespace MyChatApp.Client
 
             builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddScoped<IGuestUserService, GuestUserService>();
+            builder.Services.AddScoped<IUserIdentificationService, UserIdentificationService>();
 
             await builder.Build().RunAsync();
         }

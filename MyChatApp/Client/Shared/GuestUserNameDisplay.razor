@@ -1,7 +1,7 @@
 ﻿@using MyChatApp.Client.Services
-@inject IGuestUserService GuestUserService
+@inject IUserIdentificationService UserIdentificationService
 
-@if(GuestUserService.IsGuestUser)
+@if(UserIdentificationService.IsGuestUser())
 {
-    <span>@GuestUserService.GuestUserName</span> <span class="badge badge-pill badge-dark">Guest</span>
+    <span>@UserIdentificationService.GetGuestUserName()</span> <span class="badge badge-pill badge-dark">Guest</span>
 }

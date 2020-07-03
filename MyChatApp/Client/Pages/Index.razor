@@ -3,7 +3,7 @@
 @page "/"
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
-@inject IGuestUserService GuestUserService;
+@inject IUserIdentificationService UserIdentificationService
 
 @if (!initialized)
 {
@@ -66,10 +66,21 @@ else
 
     ElementReference UserNameInput;
 
-    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    Task<AuthenticationState> authenticationStateTask { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
+        UserIdentificationService.AuthenticationStateChanged += async () =>
+        {
+            if (string.IsNullOrEmpty(await UserIdentificationService.GetGuestUserNameAsync()))
+            {
+                await DisconnectAsync();
+            }
+
+            StateHasChanged();
+        };
+
         try
         {
             var authenticationState = await authenticationStateTask;
@@ -78,9 +89,9 @@ else
                 userName = authenticationState.User.Identity.Name;
                 await StartChat();
             }
-            else if (GuestUserService.IsGuestUser)
+            else if (await UserIdentificationService.IsGuestUserAsync())
             {
-                userName = GuestUserService.GuestUserName;
+                userName = await UserIdentificationService.GetGuestUserNameAsync();
                 await StartChat();
             }
 
@@ -111,7 +122,7 @@ else
             return;
         };
 
-        GuestUserService.SetGuestUserName(userName);
+        await UserIdentificationService.SetGuestUserNameAsync(userName);
         await StartChat();
     }
 

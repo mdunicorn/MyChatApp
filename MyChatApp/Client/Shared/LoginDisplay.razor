@@ -4,7 +4,7 @@
 
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
-@inject IGuestUserService GuestUserService
+@inject IUserIdentificationService UserIdentificationService
 
 <AuthorizeView>
     <Authorized>
@@ -12,7 +12,7 @@
         <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
     </Authorized>
     <NotAuthorized>
-        @if (GuestUserService.IsGuestUser)
+        @if (UserIdentificationService.IsGuestUser())
         {
             <span>Hello <GuestUserNameDisplay />!</span>
             <button class="nav-link btn btn-link" @onclick="DisconnectGuestUser">Disconnect</button>
@@ -23,16 +23,22 @@
 </AuthorizeView>
 
 @code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserIdentificationService.AuthenticationStateChanged += () => StateHasChanged();
+        await base.OnInitializedAsync();
+    }
+
     private async Task BeginSignOut(MouseEventArgs args)
     {
         await SignOutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");
     }
 
-    private void DisconnectGuestUser()
+    private async void DisconnectGuestUser()
     {
-        GuestUserService.ClearGuestUser();
+        await UserIdentificationService.ClearGuestUserAsync();
         Navigation.NavigateTo("");
-        StateHasChanged();
     }
 }
