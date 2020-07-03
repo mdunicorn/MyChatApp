@@ -37,7 +37,7 @@
         <h2>I am Mohammad Dehghan</h2>
         <p>What's your name?</p>
 
-        <input type="text" maxlength="32" @bind="@userName" />
+        <input type="text" @ref="UserNameInput" maxlength="32" @bind="@userName" />
         <button type="button" @onclick="@Chat"><span class="oi oi-chat" aria-hidden="true"></span> Start Chatting!</button>
 
         @if (message != null)
@@ -64,6 +64,14 @@
     // list of messages in chat
     List<Message> messages = new List<Message>();
 
+    ElementReference UserNameInput;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JSRuntime.InvokeVoidAsync("focusElement", UserNameInput);
+        await base.OnAfterRenderAsync(firstRender);
+    }
 
     /// <summary>
     /// Start chat client
