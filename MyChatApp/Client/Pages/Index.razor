@@ -37,7 +37,7 @@
         <h2>I am Mohammad Dehghan</h2>
         <p>What's your name?</p>
 
-        <input type="text" @ref="UserNameInput" maxlength="32" @bind="@userName" />
+        <input type="text" @ref="UserNameInput" maxlength="32" @bind-value="@userName" @bind-value:event="oninput" @onkeydown="userName_KeyDown" />
         <button type="button" @onclick="@Chat"><span class="oi oi-chat" aria-hidden="true"></span> Start Chatting!</button>
 
         @if (message != null)
@@ -151,6 +151,12 @@
             // clear input box
             newMessage = "";
         }
+    }
+
+    private async Task userName_KeyDown(KeyboardEventArgs ea)
+    {
+        if (ea.Key == "Enter")
+            await Chat();
     }
 
     class Message
