@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Blazored.LocalStorage;
 using MyChatApp.Client.Services;
 using MyChatApp.Client.Services.ServiceImplementations;
+using Blazor.FileReader;
 
 namespace MyChatApp.Client
 {
@@ -32,6 +33,8 @@ namespace MyChatApp.Client
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddScoped<IUserIdentificationService, UserIdentificationService>();
+
+            builder.Services.AddFileReaderService();
 
             await builder.Build().RunAsync();
         }
