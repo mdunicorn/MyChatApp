@@ -1,17 +1,16 @@
 ﻿@using MyChatApp.Shared
+@using MyChatApp.Client.Services
 @page "/"
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
+@inject IGuestUserService GuestUserService;
 
-
-@if (chatting)
+@if (!initialized)
 {
-    <div class="top-row px-4">
-        <h3>Hi, @userName!</h3>
-        <button class="btn btn-sm btn-warning ml-md-auto" @onclick="@DisconnectAsync">Disconnect</button>
-    </div>
+    <p>Initializing...</p>
 }
-<div class="content px-4">
+else
+{
 
     @if (chatting)
     {
@@ -36,9 +35,10 @@
         <h1>Hi!</h1>
         <h2>I am Mohammad Dehghan</h2>
         <p>What's your name?</p>
+        <p>Register or login using the links on top of the page, or enter user name below to continue as a guest.</p>
 
         <input type="text" @ref="UserNameInput" maxlength="32" @bind-value="@userName" @bind-value:event="oninput" @onkeydown="userName_KeyDown" />
-        <button type="button" @onclick="@Chat"><span class="oi oi-chat" aria-hidden="true"></span> Start Chatting!</button>
+        <button type="button" @onclick="@LoginAsGuest"><span class="oi oi-chat" aria-hidden="true"></span> Start Chatting!</button>
 
         @if (message != null)
         {
@@ -46,14 +46,14 @@
             <small class="form-text text-muted">@message</small>
         }
     }
-
-</div>
+}
 
 
 @code{
     bool chatting = false;
     string userName = null;
     ChatClient client = null;
+    bool initialized = false;
 
     // on-screen message
     string message = null;
@@ -66,9 +66,35 @@
 
     ElementReference UserNameInput;
 
+    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            var authenticationState = await authenticationStateTask;
+            if (authenticationState.User?.Identity.IsAuthenticated ?? false)
+            {
+                userName = authenticationState.User.Identity.Name;
+                await StartChat();
+            }
+            else if (GuestUserService.IsGuestUser)
+            {
+                userName = GuestUserService.GuestUserName;
+                await StartChat();
+            }
+
+            await base.OnInitializedAsync();
+        }
+        finally
+        {
+            initialized = true;
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && initialized)
             await JSRuntime.InvokeVoidAsync("focusElement", UserNameInput);
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -76,7 +102,7 @@
     /// <summary>
     /// Start chat client
     /// </summary>
-    async Task Chat()
+    async Task LoginAsGuest()
     {
         // check username is valid
         if (string.IsNullOrWhiteSpace(userName))
@@ -85,6 +111,12 @@
             return;
         };
 
+        GuestUserService.SetGuestUserName(userName);
+        await StartChat();
+    }
+
+    public async Task StartChat()
+    {
         try
         {
             // remove old messages if any
@@ -156,7 +188,7 @@
     private async Task userName_KeyDown(KeyboardEventArgs ea)
     {
         if (ea.Key == "Enter")
-            await Chat();
+            await LoginAsGuest();
     }
 
     class Message

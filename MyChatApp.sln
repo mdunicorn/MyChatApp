@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChatApp.Server", "MyChatApp\Server\MyChatApp.Server.csproj", "{5C665B02-7627-45BB-B660-11EB667D67F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChatApp.Server", "MyChatApp\Server\MyChatApp.Server.csproj", "{5C665B02-7627-45BB-B660-11EB667D67F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChatApp.Client", "MyChatApp\Client\MyChatApp.Client.csproj", "{31D05F14-E0D0-4DE9-9D0A-0E1F0CDD0558}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChatApp.Client", "MyChatApp\Client\MyChatApp.Client.csproj", "{31D05F14-E0D0-4DE9-9D0A-0E1F0CDD0558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChatApp.Shared", "MyChatApp\Shared\MyChatApp.Shared.csproj", "{80963A9B-D985-4A17-BAF3-2DBD258F4BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChatApp.Shared", "MyChatApp\Shared\MyChatApp.Shared.csproj", "{80963A9B-D985-4A17-BAF3-2DBD258F4BDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Blazored.LocalStorage;
+using MyChatApp.Client.Services;
+using MyChatApp.Client.Services.ServiceImplementations;
 
 namespace MyChatApp.Client
 {
@@ -25,6 +28,10 @@ namespace MyChatApp.Client
             builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MyChatApp.ServerAPI"));
 
             builder.Services.AddApiAuthorization();
+
+            builder.Services.AddBlazoredLocalStorage();
+
+            builder.Services.AddScoped<IGuestUserService, GuestUserService>();
 
             await builder.Build().RunAsync();
         }

@@ -1,8 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using MyChatApp.Client.Services;
 
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
+@inject IGuestUserService GuestUserService
 
 <AuthorizeView>
     <Authorized>
@@ -10,6 +12,11 @@
         <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
     </Authorized>
     <NotAuthorized>
+        @if (GuestUserService.IsGuestUser)
+        {
+            <span>Hello <GuestUserNameDisplay />!</span>
+            <button class="nav-link btn btn-link" @onclick="DisconnectGuestUser">Disconnect</button>
+        }
         <a href="authentication/register">Register</a>
         <a href="authentication/login">Log in</a>
     </NotAuthorized>
@@ -20,5 +27,12 @@
     {
         await SignOutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");
+    }
+
+    private void DisconnectGuestUser()
+    {
+        GuestUserService.ClearGuestUser();
+        Navigation.NavigateTo("");
+        StateHasChanged();
     }
 }
