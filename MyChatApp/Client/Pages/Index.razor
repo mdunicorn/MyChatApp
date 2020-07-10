@@ -1,6 +1,7 @@
 ﻿@using MyChatApp.Shared
 @using MyChatApp.Client.Services
 @using MyChatApp.Client.Components.Messaging
+@using Markdig 
 
 @page "/"
 @inject NavigationManager navigationManager
@@ -22,7 +23,7 @@ else
             {
                 <div class="@item.CSS">
                     <div class="user">@item.Username</div>
-                    <div class="msg">@item.Body</div>
+                    <div class="msg">@((MarkupString)Markdown.ToHtml(item.Body))</div>
                 </div>
             }
             <hr />
