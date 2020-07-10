@@ -4,7 +4,7 @@
 <div>
     <textarea @ref="editorTextArea" class="form-control" rows="3"
               @bind="Text" @bind:event="oninput"
-              placeholder="Enter message to send, then press the Send button." />
+              placeholder="@PlaceholderText" />
     <div class="editor-controls-container">
         <a @ref="emojiButton" class="editor-control">😀</a>
         <a class="editor-control"><span class="oi oi-image editor-control-open-iconic"></span></a>
@@ -30,6 +30,8 @@
             TextChanged.InvokeAsync(_text);
         }
     }
+
+    [Parameter] public string PlaceholderText { get; set; }
 
     [Parameter] public EventCallback<string> TextChanged { get; set; }
     [Parameter] public EventCallback OnSend { get; set; }
