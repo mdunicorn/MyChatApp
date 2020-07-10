@@ -213,9 +213,9 @@ textarea {
 .sent {
     background: #03a9f4;
     color: #fff;
-    margin-left: 10%;
+    margin-left: 10px;
+    margin-right: 10%;
     top: 50%;
-    text-align: right;
 }
 
 .received {
