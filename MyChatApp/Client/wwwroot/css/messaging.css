@@ -1,0 +1,20 @@
+﻿.editor-controls-container {
+    display: inline-block;
+    width: 100%;
+}
+
+.editor-control {
+    float: left;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.editor-control-open-iconic {
+    font-size: 16px;
+    margin: 3px;
+}
+
+.editor-send {
+    float: right;
+}

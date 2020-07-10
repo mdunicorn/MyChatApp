@@ -1,5 +1,7 @@
 ﻿@using MyChatApp.Shared
 @using MyChatApp.Client.Services
+@using MyChatApp.Client.Components.Messaging
+
 @page "/"
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
@@ -24,8 +26,8 @@ else
                 </div>
             }
             <hr />
-            <textarea class="input-lg" placeholder="enter your comment" @bind="@newMessage"></textarea>
-            <button class="btn btn-default" @onclick="@SendAsync">Send</button>
+            <MessageEditor @bind-Text="newMessage" OnSend="SendAsync" />
+
         </div>
 
     }
@@ -183,6 +185,11 @@ else
             message = "chat ended";
             chatting = false;
         }
+    }
+
+    void OnSendClicked()
+    {
+        _ = SendAsync();
     }
 
     async Task SendAsync()
