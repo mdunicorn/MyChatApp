@@ -2,10 +2,11 @@
     element.focus();
 }
 
-function createEmojiPicker(button, editable) {
+function createEmojiPicker(button, editable, dotNetObjRef, onUpdatedMehodName) {
     const picker = new EmojiButton();
     picker.on('emoji', emoji => {
         insertAtCursor(editable, emoji);
+        dotNetObjRef.invokeMethodAsync(onUpdatedMehodName, editable.value);
         setTimeout(() => editable.focus(), 0);
     });
 

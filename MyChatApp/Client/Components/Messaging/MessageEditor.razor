@@ -1,4 +1,6 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@implements IDisposable
+@inject IJSRuntime JSRuntime
+
 <div>
     <textarea @ref="editorTextArea" class="form-control" rows="3"
               @bind="Text" @bind:event="oninput"
@@ -32,10 +34,30 @@
     [Parameter] public EventCallback<string> TextChanged { get; set; }
     [Parameter] public EventCallback OnSend { get; set; }
 
+    DotNetObjectReference<MessageEditor> _thisRef;
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
-            JSRuntime.InvokeVoidAsync("createEmojiPicker", emojiButton, editorTextArea);
+        {
+            _thisRef = DotNetObjectReference.Create(this);
+            JSRuntime.InvokeVoidAsync("createEmojiPicker", emojiButton, editorTextArea, _thisRef, "OnUpdated");
+        }
         base.OnAfterRender(firstRender);
+    }
+
+    [JSInvokable]
+    public void OnUpdated(string text)
+    {
+        Text = text;
+    }
+
+    public void Dispose()
+    {
+        if (_thisRef != null)
+        {
+            _thisRef.Dispose();
+            _thisRef = null;
+        }
     }
 }
