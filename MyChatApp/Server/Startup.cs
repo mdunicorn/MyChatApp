@@ -1,11 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using MyChatApp.Server.Data;
 using MyChatApp.Server.Models;
+using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.AspNetCore.Identity;
 
 namespace MyChatApp.Server
 {
@@ -52,6 +49,17 @@ namespace MyChatApp.Server
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
+            services.Configure<PolicySchemeOptions>(IdentityServerJwtConstants.IdentityServerJwtScheme, options =>
+            {
+                options.ForwardDefaultSelector = httpContext =>
+                {
+                    if (httpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                        && authHeader.Count == 1 && authHeader[0].StartsWith("Bearer"))
+                        return IdentityServerJwtConstants.IdentityServerJwtBearerScheme;
+                    return IdentityConstants.ApplicationScheme;
+                };
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
@@ -85,9 +93,9 @@ namespace MyChatApp.Server
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<Hubs.ChatHub>(Shared.ChatClient.HubUrl);
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHub<Hubs.ChatHub>(Shared.ChatClient.HubUrl);
                 endpoints.MapFallbackToFile("index.html");
             });
         }
