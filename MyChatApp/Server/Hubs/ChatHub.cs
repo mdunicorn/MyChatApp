@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using IdentityServer4.Extensions;
+using Microsoft.AspNetCore.SignalR;
 using MyChatApp.Shared;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace MyChatApp.Server.Hubs
 
         public async Task SendMessage(string username, string message)
         {
-            await Clients.All.SendAsync(Messages.RECEIVE, username, message);
+            var identityUserName = Context.User.GetDisplayName();
+            if (string.IsNullOrEmpty(identityUserName))
+                identityUserName = Context.UserIdentifier;
+            await Clients.All.SendAsync(Messages.RECEIVE, identityUserName ?? username, message);
         }
 
         public async Task Register(string username)
