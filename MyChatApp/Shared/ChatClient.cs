@@ -60,7 +60,7 @@ namespace MyChatApp.Shared
                 Console.WriteLine("ChatClient: calling Start()");
 
                 // add handler for receiving messages
-                _hubConnection.On<ChatMessageModel>(
+                _hubConnection.On<ChatMessageDTO>(
                     Messages.RECEIVE,
                     message => MessageReceived?.Invoke(this, message));
 
@@ -81,7 +81,7 @@ namespace MyChatApp.Shared
         /// <remarks>
         /// Instance classes should subscribe to this event
         /// </remarks>
-        public event EventHandler<ChatMessageModel> MessageReceived;
+        public event EventHandler<ChatMessageDTO> MessageReceived;
 
         /// <summary>
         /// Send a message to the hub
@@ -92,7 +92,7 @@ namespace MyChatApp.Shared
             if (!_started)
                 throw new InvalidOperationException("Client not started");
 
-            var messageModel = new ChatMessageModel(_username, message, DateTimeOffset.Now);
+            var messageModel = new ChatMessageDTO(_username, message, DateTimeOffset.Now);
 
             await _hubConnection.SendAsync(Messages.SEND, messageModel);
         }

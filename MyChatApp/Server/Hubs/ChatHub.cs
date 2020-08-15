@@ -15,7 +15,7 @@ namespace MyChatApp.Server.Hubs
     {
         private static readonly Dictionary<string, string> userLookup = new Dictionary<string, string>();
 
-        public async Task SendMessage(ChatMessageModel message)
+        public async Task SendMessage(ChatMessageDTO message)
         {
             string identityUserName = null;
             if (Context.User?.Identity.IsAuthenticated ?? false)
@@ -35,7 +35,7 @@ namespace MyChatApp.Server.Hubs
                 userLookup.Add(currentId, username);
                 await Clients.AllExcept(currentId).SendAsync(
                     Messages.RECEIVE,
-                    new ChatMessageModel(username, $"{username} joined the chat"));
+                    new ChatMessageDTO(username, $"{username} joined the chat"));
             }
         }
 
@@ -56,7 +56,7 @@ namespace MyChatApp.Server.Hubs
             userLookup.Remove(id);
             await Clients.AllExcept(Context.ConnectionId).SendAsync(
                 Messages.RECEIVE,
-                new ChatMessageModel(username, $"{username} has left the chat"));
+                new ChatMessageDTO(username, $"{username} has left the chat"));
             await base.OnDisconnectedAsync(e);
         }
     }

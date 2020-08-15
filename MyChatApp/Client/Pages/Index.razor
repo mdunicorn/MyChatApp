@@ -161,7 +161,7 @@ else
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="messageModel"></param>
-    void MessageReceived(object sender, MyChatApp.Shared.Models.ChatMessageModel messageModel)
+    void MessageReceived(object sender, MyChatApp.Shared.Models.ChatMessageDTO messageModel)
     {
         Console.WriteLine($"Blazor: receive {messageModel.UserName}: {messageModel.Message}");
         bool isMine = false;

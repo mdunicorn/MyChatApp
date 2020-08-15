@@ -4,12 +4,12 @@ using System.Text;
 
 namespace MyChatApp.Shared.Models
 {
-    public class ChatMessageModel
+    public class ChatMessageDTO
     {
-        public ChatMessageModel()
+        public ChatMessageDTO()
         { }
 
-        public ChatMessageModel(string username, string message, DateTimeOffset? dateTime = null)
+        public ChatMessageDTO(string username, string message, DateTimeOffset? dateTime = null)
         {
             UserName = username;
             Message = message;
