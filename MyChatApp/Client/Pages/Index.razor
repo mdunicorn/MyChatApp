@@ -19,7 +19,7 @@ else
     {
         <div id="scrollbox">
 
-            @foreach (var item in messages)
+            @foreach (var item in _allMessages)
             {
                 <div class="@item.CSS">
                     <div class="user">@item.Username</div>
@@ -65,7 +65,7 @@ else
     string newMessage = null;
 
     // list of messages in chat
-    List<Message> messages = new List<Message>();
+    List<Message> _allMessages = new List<Message>();
 
     ElementReference UserNameInput;
 
@@ -134,7 +134,7 @@ else
         try
         {
             // remove old messages if any
-            messages.Clear();
+            _allMessages.Clear();
 
             // Create the chat client
             string baseUrl = navigationManager.BaseUri;
@@ -160,18 +160,18 @@ else
     /// Inbound message
     /// </summary>
     /// <param name="sender"></param>
-    /// <param name="e"></param>
-    void MessageReceived(object sender, MessageReceivedEventArgs e)
+    /// <param name="messageModel"></param>
+    void MessageReceived(object sender, MyChatApp.Shared.Models.ChatMessageModel messageModel)
     {
-        Console.WriteLine($"Blazor: receive {e.UserName}: {e.Message}");
+        Console.WriteLine($"Blazor: receive {messageModel.UserName}: {messageModel.Message}");
         bool isMine = false;
-        if (!string.IsNullOrWhiteSpace(e.UserName))
+        if (!string.IsNullOrWhiteSpace(messageModel.UserName))
         {
-            isMine = string.Equals(e.UserName, userName, StringComparison.CurrentCultureIgnoreCase);
+            isMine = string.Equals(messageModel.UserName, userName, StringComparison.CurrentCultureIgnoreCase);
         }
 
-        var newMsg = new Message(e.UserName, e.Message, isMine);
-        messages.Add(newMsg);
+        var newMsg = new Message(messageModel.UserName, messageModel.Message, messageModel.DateTime, isMine);
+        _allMessages.Add(newMsg);
 
         // Inform blazor the UI needs updating
         StateHasChanged();
@@ -212,15 +212,17 @@ else
 
     class Message
     {
-        public Message(string username, string body, bool mine)
+        public Message(string username, string body, DateTimeOffset dateTime, bool mine)
         {
             Username = username;
             Body = body;
+            DateTime = dateTime;
             Mine = mine;
         }
 
         public string Username { get; set; }
         public string Body { get; set; }
+        public DateTimeOffset DateTime { get; set; }
         public bool Mine { get; set; }
 
         /// <summary>

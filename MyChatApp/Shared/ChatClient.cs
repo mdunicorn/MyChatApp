@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using MyChatApp.Shared.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -59,10 +60,9 @@ namespace MyChatApp.Shared
                 Console.WriteLine("ChatClient: calling Start()");
 
                 // add handler for receiving messages
-                _hubConnection.On<string, string>(Messages.RECEIVE, (user, message) =>
-                 {
-                     HandleReceiveMessage(user, message);
-                 });
+                _hubConnection.On<ChatMessageModel>(
+                    Messages.RECEIVE,
+                    message => MessageReceived?.Invoke(this, message));
 
                 // start the connection
                 await _hubConnection.StartAsync();
@@ -76,23 +76,12 @@ namespace MyChatApp.Shared
         }
 
         /// <summary>
-        /// Handle an inbound message from a hub
-        /// </summary>
-        /// <param name="method">event name</param>
-        /// <param name="message">message content</param>
-        private void HandleReceiveMessage(string username, string message)
-        {
-            // raise an event to subscribers
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(username, message));
-        }
-
-        /// <summary>
         /// Event raised when this client receives a message
         /// </summary>
         /// <remarks>
         /// Instance classes should subscribe to this event
         /// </remarks>
-        public event MessageReceivedEventHandler MessageReceived;
+        public event EventHandler<ChatMessageModel> MessageReceived;
 
         /// <summary>
         /// Send a message to the hub
@@ -100,11 +89,12 @@ namespace MyChatApp.Shared
         /// <param name="message">message to send</param>
         public async Task SendAsync(string message)
         {
-            // check we are connected
             if (!_started)
                 throw new InvalidOperationException("Client not started");
-            // send the message
-            await _hubConnection.SendAsync(Messages.SEND, _username, message);
+
+            var messageModel = new ChatMessageModel(_username, message, DateTimeOffset.Now);
+
+            await _hubConnection.SendAsync(Messages.SEND, messageModel);
         }
 
         /// <summary>
@@ -133,36 +123,5 @@ namespace MyChatApp.Shared
             await StopAsync();
         }
     }
-
-    /// <summary>
-    /// Delegate for the message handler
-    /// </summary>
-    /// <param name="sender">the SignalRclient instance</param>
-    /// <param name="e">Event args</param>
-    public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
-
-    /// <summary>
-    /// Message received argument class
-    /// </summary>
-    public class MessageReceivedEventArgs : EventArgs
-    {
-        public MessageReceivedEventArgs(string userName, string message)
-        {
-            UserName = userName;
-            Message = message;
-        }
-
-        /// <summary>
-        /// Name of the message/event
-        /// </summary>
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// Message data items
-        /// </summary>
-        public string Message { get; set; }
-
-    }
-
 }
 

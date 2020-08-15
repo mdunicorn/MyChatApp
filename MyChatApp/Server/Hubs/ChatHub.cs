@@ -1,9 +1,12 @@
 ﻿using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Internal;
 using MyChatApp.Shared;
+using MyChatApp.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MyChatApp.Server.Hubs
@@ -12,12 +15,16 @@ namespace MyChatApp.Server.Hubs
     {
         private static readonly Dictionary<string, string> userLookup = new Dictionary<string, string>();
 
-        public async Task SendMessage(string username, string message)
+        public async Task SendMessage(ChatMessageModel message)
         {
-            var identityUserName = Context.User.GetDisplayName();
+            string identityUserName = null;
+            if (Context.User?.Identity.IsAuthenticated ?? false)
+                identityUserName = Context.User.Identity.Name;
             if (string.IsNullOrEmpty(identityUserName))
                 identityUserName = Context.UserIdentifier;
-            await Clients.All.SendAsync(Messages.RECEIVE, identityUserName ?? username, message);
+            if(!string.IsNullOrEmpty(identityUserName))
+                message.UserName = identityUserName;
+            await Clients.All.SendAsync(Messages.RECEIVE, message);
         }
 
         public async Task Register(string username)
@@ -28,7 +35,7 @@ namespace MyChatApp.Server.Hubs
                 userLookup.Add(currentId, username);
                 await Clients.AllExcept(currentId).SendAsync(
                     Messages.RECEIVE,
-                    username, $"{username} joined the chat");
+                    new ChatMessageModel(username, $"{username} joined the chat"));
             }
         }
 
@@ -49,7 +56,7 @@ namespace MyChatApp.Server.Hubs
             userLookup.Remove(id);
             await Clients.AllExcept(Context.ConnectionId).SendAsync(
                 Messages.RECEIVE,
-                username, $"{username} has left the chat");
+                new ChatMessageModel(username, $"{username} has left the chat"));
             await base.OnDisconnectedAsync(e);
         }
     }
