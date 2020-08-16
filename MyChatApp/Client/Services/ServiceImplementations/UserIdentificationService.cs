@@ -73,7 +73,7 @@ namespace MyChatApp.Client.Services.ServiceImplementations
 
         public Task<string> GetGuestUserNameAsync()
         {
-            return _localStorageService.GetItemAsync<string>(_localStorageKey);
+            return _localStorageService.GetItemAsync<string>(_localStorageKey).AsTask();
         }
 
         public void SetGuestUserName(string name)
