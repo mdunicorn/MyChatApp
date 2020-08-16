@@ -160,23 +160,23 @@ else
     /// Inbound message
     /// </summary>
     /// <param name="sender"></param>
-    /// <param name="messageModel"></param>
-    void MessageReceived(object sender, MyChatApp.Shared.Models.ChatMessageDTO messageModel)
+    /// <param name="messageDTO"></param>
+    void MessageReceived(object sender, ChatMessageDTO messageDTO)
     {
-        Console.WriteLine($"Blazor: receive {messageModel.UserName}: {messageModel.Message}");
-        bool isMine = false;
-        if (!string.IsNullOrWhiteSpace(messageModel.UserName))
-        {
-            isMine = string.Equals(messageModel.UserName, userName, StringComparison.CurrentCultureIgnoreCase);
-        }
+        Console.WriteLine($"Blazor: receive {messageDTO.UserName}: {messageDTO.Message}");
+        bool isMine = IsMine(messageDTO);
 
-        var newMsg = new Message(messageModel.UserName, messageModel.Message, messageModel.DateTime, isMine);
+        var newMsg = new Message(messageDTO.UserName, messageDTO.Message, messageDTO.DateTime, isMine);
         _allMessages.Add(newMsg);
 
         // Inform blazor the UI needs updating
         StateHasChanged();
     }
 
+    private bool IsMine(ChatMessageDTO messageDTO)
+    {
+        return string.Equals(messageDTO.UserName, userName, StringComparison.CurrentCultureIgnoreCase);
+    }
     async Task DisconnectAsync()
     {
         if (chatting)
