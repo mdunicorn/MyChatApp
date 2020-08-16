@@ -1,6 +1,10 @@
-﻿function focusElement(element) {
+﻿import { EmojiButton } from './emoji-button-4.0.2.min.js';
+
+function focusElement(element) {
     element.focus();
 }
+
+window.focusElement = focusElement;
 
 function createEmojiPicker(button, editable, dotNetObjRef, onUpdatedMehodName) {
     const picker = new EmojiButton();
@@ -14,6 +18,8 @@ function createEmojiPicker(button, editable, dotNetObjRef, onUpdatedMehodName) {
         picker.togglePicker(button);
     });
 }
+
+window.createEmojiPicker = createEmojiPicker
 
 function insertAtCursor(element, text) {
     //IE support
