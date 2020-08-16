@@ -1,6 +1,7 @@
 ﻿using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
+using MyChatApp.Server.Services;
 using MyChatApp.Shared;
 using MyChatApp.Shared.Models;
 using System;
@@ -14,6 +15,12 @@ namespace MyChatApp.Server.Hubs
     public class ChatHub : Hub
     {
         private static readonly Dictionary<string, string> userLookup = new Dictionary<string, string>();
+        private readonly IMessagesService _messagesService;
+
+        public ChatHub(IMessagesService messagesService)
+        {
+            _messagesService = messagesService;
+        }
 
         public async Task SendMessage(ChatMessageDTO message)
         {
@@ -24,6 +31,9 @@ namespace MyChatApp.Server.Hubs
                 identityUserName = Context.UserIdentifier;
             if(!string.IsNullOrEmpty(identityUserName))
                 message.UserName = identityUserName;
+
+            await _messagesService.InsertMessageAsync(message);
+
             await Clients.All.SendAsync(Messages.RECEIVE, message);
         }
 

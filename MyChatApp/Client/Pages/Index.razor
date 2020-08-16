@@ -1,4 +1,5 @@
 ﻿@using MyChatApp.Shared
+@using MyChatApp.Shared.Models
 @using MyChatApp.Client.Services
 @using MyChatApp.Client.Components.Messaging
 @using Markdig 
@@ -7,6 +8,7 @@
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
 @inject IUserIdentificationService UserIdentificationService
+@inject HttpClient HttpClient;
 
 @if (!initialized)
 {
@@ -133,8 +135,7 @@ else
     {
         try
         {
-            // remove old messages if any
-            _allMessages.Clear();
+            await LoadLastMessages();
 
             // Create the chat client
             string baseUrl = navigationManager.BaseUri;
@@ -177,6 +178,7 @@ else
     {
         return string.Equals(messageDTO.UserName, userName, StringComparison.CurrentCultureIgnoreCase);
     }
+
     async Task DisconnectAsync()
     {
         if (chatting)
@@ -201,6 +203,21 @@ else
             await client.SendAsync(newMessage);
             // clear input box
             newMessage = "";
+        }
+    }
+
+    private async Task LoadLastMessages()
+    {
+        var messageDtos = await HttpClient.GetFromJsonAsync<List<ChatMessageDTO>>(RouteConstants.RecentMessages);
+        var list = new List<Message>();
+        foreach(var dto in messageDtos)
+        {
+            list.Add(
+                new Message(
+                    dto.UserName,
+                    dto.Message,
+                    dto.DateTime,
+                    IsMine(dto)));
         }
     }
 

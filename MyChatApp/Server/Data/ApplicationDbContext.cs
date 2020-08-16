@@ -17,5 +17,7 @@ namespace MyChatApp.Server.Data
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }
+
+        public DbSet<ChatMessage> ChatMessages { get; }
     }
 }

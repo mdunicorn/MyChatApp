@@ -10,6 +10,10 @@ using MyChatApp.Server.Data;
 using MyChatApp.Server.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
+using MyChatApp.Server.Services;
+using MyChatApp.Server.Services.Implementations;
+using MyChatApp.Server.Services.Data;
+using MyChatApp.Server.Services.Data.Implementations;
 
 namespace MyChatApp.Server
 {
@@ -63,6 +67,10 @@ namespace MyChatApp.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
+
+            services.AddTransient<IBaseDbService, BaseDbService>();
+            services.AddTransient<IUsersService, UsersService>();
+            services.AddTransient<IMessagesService, MessagesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
