@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
@@ -21,17 +20,16 @@ namespace MyChatApp.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddHttpClient("MyChatApp.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+            builder.Services.AddHttpClient(HttpClientHelper.AuthenticatedClientName, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
                 .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-
-            // Supply HttpClient instances that include access tokens when making requests to the server project
-            builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("MyChatApp.ServerAPI"));
+            builder.Services.AddHttpClient(HttpClientHelper.UnauthenticatedClientName, client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
             builder.Services.AddApiAuthorization();
 
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddScoped<IUserIdentificationService, UserIdentificationService>();
+            builder.Services.AddScoped<IUserHttpClientFactory, UserHttpClientFactory>();
 
             await builder.Build().RunAsync();
         }

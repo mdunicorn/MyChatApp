@@ -2,13 +2,13 @@
 @using MyChatApp.Shared.Models
 @using MyChatApp.Client.Services
 @using MyChatApp.Client.Components.Messaging
-@using Markdig 
+@using Markdig
 
 @page "/"
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
 @inject IUserIdentificationService UserIdentificationService
-@inject HttpClient HttpClient;
+@inject IUserHttpClientFactory HttpClientFactory
 
 @if (!initialized)
 {
@@ -152,8 +152,7 @@ else
         catch (Exception e)
         {
             message = $"ERROR: Failed to start chat client: {e.Message}";
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
+            Console.WriteLine(e.ToString());
         }
     }
 
@@ -208,16 +207,20 @@ else
 
     private async Task LoadLastMessages()
     {
-        var messageDtos = await HttpClient.GetFromJsonAsync<List<ChatMessageDTO>>(RouteConstants.RecentMessages);
-        var list = new List<Message>();
-        foreach(var dto in messageDtos)
+        using (var httpClient = await HttpClientFactory.CreateClientAsync())
         {
-            list.Add(
-                new Message(
-                    dto.UserName,
-                    dto.Message,
-                    dto.DateTime,
-                    IsMine(dto)));
+            var messageDtos = await httpClient.GetFromJsonAsync<List<ChatMessageDTO>>(RouteConstants.RecentMessages);
+            var list = new List<Message>();
+            foreach (var dto in messageDtos)
+            {
+                list.Add(
+                    new Message(
+                        dto.UserName,
+                        dto.Message,
+                        dto.DateTime,
+                        IsMine(dto)));
+            }
+            _allMessages = list;
         }
     }
 
